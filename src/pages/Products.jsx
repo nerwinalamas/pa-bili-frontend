@@ -4,6 +4,7 @@ import useProductStore from "../store/useProductStore";
 import useCartStore from "../store/useCartStore";
 import ProductCard from "../components/ProductCard";
 import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
 import {
     Select,
     SelectContent,
@@ -13,6 +14,7 @@ import {
 } from "../components/ui/select";
 
 const Products = () => {
+    const { id } = useAuth();
     const products = useProductStore((state) => state.products);
     const fetchProducts = useProductStore((state) => state.fetchProducts);
     const fetchCart = useCartStore((state) => state.fetchCart);
@@ -20,7 +22,8 @@ const Products = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [sortBy, setSortBy] = useState("name");
     const [filterCategory, setFilterCategory] = useState("All");
-    const { id } = useAuth();
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 12;
 
     useEffect(() => {
         fetchProducts();
@@ -34,14 +37,17 @@ const Products = () => {
 
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);
+        setCurrentPage(1);
     };
 
     const handleSort = (value) => {
         setSortBy(value);
+        setCurrentPage(1);
     };
 
     const handleFilter = (value) => {
         setFilterCategory(value);
+        setCurrentPage(1);
     };
 
     const filteredAndSortedProducts = products
@@ -60,6 +66,38 @@ const Products = () => {
                 return b.price - a.price;
             }
         });
+
+    const totalPages = Math.ceil(filteredAndSortedProducts.length / pageSize);
+    const paginatedProducts = filteredAndSortedProducts.slice(
+        (currentPage - 1) * pageSize,
+        currentPage * pageSize
+    );
+
+    const generatePaginationButtons = () => {
+        const buttons = [];
+        const maxButtons = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+        let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+
+        if (endPage - startPage + 1 < maxButtons) {
+            startPage = Math.max(1, endPage - maxButtons + 1);
+        }
+
+        for (let page = startPage; page <= endPage; page++) {
+            buttons.push(
+                <Button
+                    key={page}
+                    variant={page === currentPage ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(page)}
+                >
+                    {page}
+                </Button>
+            );
+        }
+
+        return buttons;
+    };
 
     return (
         <main className="min-h-screen container mx-auto px-4 py-8">
@@ -102,7 +140,7 @@ const Products = () => {
                 </Select>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredAndSortedProducts.map((product) => (
+                {paginatedProducts.map((product) => (
                     <ProductCard
                         key={product._id}
                         userId={id}
@@ -114,6 +152,35 @@ const Products = () => {
                     />
                 ))}
             </div>
+            {totalPages > 1 && (
+                <div className="mt-4 flex items-center justify-center space-x-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                            setCurrentPage((page) => Math.max(1, page - 1))
+                        }
+                        disabled={currentPage === 1}
+                    >
+                        Previous
+                    </Button>
+
+                    {generatePaginationButtons()}
+
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                            setCurrentPage((page) =>
+                                Math.min(totalPages, page + 1)
+                            )
+                        }
+                        disabled={currentPage === totalPages}
+                    >
+                        Next
+                    </Button>
+                </div>
+            )}
         </main>
     );
 };
