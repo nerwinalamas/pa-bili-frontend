@@ -1,22 +1,45 @@
 import { useState } from "react";
+import { API_BASE_URL } from "../lib/constants";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 
 const Contact = () => {
-    const [name, setName] = useState('')
-    const [email, setEmail] = useState('')
-    const [message, setMessage] = useState('')
-  
-    const handleSubmit = (e) => {
-      e.preventDefault()
-      // Here you would typically send the form data to your backend
-      console.log('Form submitted:', { name, email, message })
-      // Reset form fields
-      setName('')
-      setEmail('')
-      setMessage('')
-    }
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [message, setMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/contact`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name,
+                    email,
+                    message,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to send message");
+            }
+
+            setName("");
+            setEmail("");
+            setMessage("");
+        } catch (error) {
+            console.error("Error sending message:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <main className="min-h-screen container mx-auto px-4 py-8">
@@ -27,8 +50,8 @@ const Contact = () => {
                         Get in Touch
                     </h2>
                     <p className="text-muted-foreground mb-4">
-                        We&apos;re here to help and answer any question you might
-                        have. We look forward to hearing from you!
+                        We&apos;re here to help and answer any question you
+                        might have. We look forward to hearing from you!
                     </p>
                     <div className="space-y-4">
                         <div>
@@ -103,7 +126,9 @@ const Contact = () => {
                                 required
                             />
                         </div>
-                        <Button type="submit">Send Message</Button>
+                        <Button type="submit" disabled={isLoading}>
+                            {isLoading ? "Sending..." : "Send Message"}
+                        </Button>
                     </form>
                 </div>
             </div>
