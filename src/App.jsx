@@ -17,6 +17,7 @@ import ProductDetails from "./pages/ProductDetails";
 import ChangePassword from "./pages/ChangePassword";
 import ShippingPreferences from "./pages/ShippingPreferences";
 import PaymentMethods from "./pages/PaymentMethods";
+import Checkout from "./pages/Checkout";
 
 const App = () => {
     return (
@@ -40,6 +41,7 @@ const App = () => {
                         <Route path="/account/change-password" element={<ChangePassword />} />
                         <Route path="/account/payment-methods" element={<PaymentMethods />} />
                         <Route path="/account/shipping-preferences" element={<ShippingPreferences />} />
+                        <Route path="/checkout" element={<Checkout />} />
                     </Route>
                     <Route path="/dashboard" element={<Dashboard />} />
                 </Route>
