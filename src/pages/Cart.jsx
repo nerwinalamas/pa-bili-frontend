@@ -191,9 +191,11 @@ const Cart = () => {
                         <div className="text-2xl font-bold mb-4">
                             Total: ${calculateTotal().toFixed(2)}
                         </div>
-                        <Button type="button" size="lg">
-                            Proceed to Checkout
-                        </Button>
+                        <Link to="/checkout">
+                            <Button type="button" size="lg">
+                                Proceed to Checkout
+                            </Button>
+                        </Link>
                     </div>
                 </>
             )}
