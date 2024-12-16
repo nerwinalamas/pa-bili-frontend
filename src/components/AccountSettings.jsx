@@ -72,15 +72,11 @@ const AccountSettings = () => {
                         <CreditCard className="h-5 w-5" />
                         <span>Payment Methods</span>
                     </div>
-                    <Link to="/account/payment-methods">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            disabled={isLoading}
-                        >
-                            Manage
-                        </Button>
-                    </Link>
+                    {/* <Link to="/account/payment-methods"> */}
+                    <Button type="button" variant="outline" disabled>
+                        Manage
+                    </Button>
+                    {/* </Link> */}
                 </div>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
