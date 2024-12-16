@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { API_BASE_URL } from "../lib/constants";
+import useCartStore from "../store/useCartStore";
 import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
@@ -19,12 +21,10 @@ import {
     TableHeader,
     TableRow,
 } from "../components/ui/table";
+import { useNavigate } from "react-router-dom";
 
 const ProductList = () => {
-    const products = [
-        { name: "Adjustable Dumbbells", price: 249.99, quantity: 1 },
-        { name: "Air Fryer", price: 89.99, quantity: 1 },
-    ];
+    const cartItems = useCartStore((state) => state.cartItems);
 
     return (
         <Table>
@@ -37,15 +37,11 @@ const ProductList = () => {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {products.map((product) => (
-                    <TableRow key={product.name}>
-                        <TableCell>{product.name}</TableCell>
-                        <TableCell>
-                            {product.quantity}
-                        </TableCell>
-                        <TableCell>
-                            ${product.price.toFixed(2)}
-                        </TableCell>
+                {cartItems.map((product) => (
+                    <TableRow key={product._id}>
+                        <TableCell>{product.productId.name}</TableCell>
+                        <TableCell>{product.quantity}</TableCell>
+                        <TableCell>${product.price.toFixed(2)}</TableCell>
                         <TableCell className="text-right">
                             ${(product.price * product.quantity).toFixed(2)}
                         </TableCell>
@@ -58,6 +54,96 @@ const ProductList = () => {
 
 const Checkout = () => {
     const [paymentMethod, setPaymentMethod] = useState("card");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [street, setStreet] = useState("");
+    const [city, setCity] = useState("");
+    const [postalCode, setPostalCode] = useState("");
+    const [country, setCountry] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+
+    const cartItems = useCartStore((state) => state.cartItems);
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setIsLoading(true);
+
+                const response = await fetch(
+                    `${API_BASE_URL}/api/auth/profile`,
+                    {
+                        method: "GET",
+                        credentials: "include",
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch data");
+                }
+
+                const data = await response.json();
+
+                setFirstName(data.firstName);
+                setLastName(data.lastName);
+                setStreet(data.street);
+                setCity(data.city);
+                setPostalCode(data.postalCode);
+                setCountry(data.country);
+            } catch (error) {
+                console.error("fetch data error:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    const calculateTotal = () => {
+        const subtotal = cartItems.reduce(
+            (total, item) => total + item.price * item.quantity,
+            0
+        );
+        const shippingFee = 10;
+        const total = subtotal + shippingFee;
+
+        return { subtotal, shippingFee, total };
+    };
+
+    const fees = calculateTotal();
+
+    const handlePlaceOrder = async () => {
+        setIsLoading(true);
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/order`, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    orderItems: cartItems,
+                    shippingAddress: { street, city, postalCode, country },
+                    paymentMethod,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to place order");
+            }
+
+            const data = await response.json();
+
+            navigate(`/order-confirmation/${data._id}`)
+        } catch (error) {
+            console.error("Place order error:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gray-50 p-4 md:p-6">
@@ -77,25 +163,65 @@ const Checkout = () => {
                                     <Label htmlFor="firstName">
                                         First Name
                                     </Label>
-                                    <Input id="firstName" />
+                                    <Input
+                                        id="firstName"
+                                        type="text"
+                                        value={firstName}
+                                        onChange={(e) =>
+                                            setFirstName(e.target.value)
+                                        }
+                                        disabled={isLoading}
+                                    />
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="lastName">Last Name</Label>
-                                    <Input id="lastName" />
+                                    <Input
+                                        id="lastName"
+                                        type="text"
+                                        value={lastName}
+                                        onChange={(e) =>
+                                            setLastName(e.target.value)
+                                        }
+                                        disabled={isLoading}
+                                    />
                                 </div>
                                 <div className="space-y-2 sm:col-span-2">
-                                    <Label htmlFor="address">Address</Label>
-                                    <Input id="address" />
+                                    <Label htmlFor="street">Street</Label>
+                                    <Input
+                                        id="street"
+                                        type="text"
+                                        value={street}
+                                        onChange={(e) =>
+                                            setStreet(e.target.value)
+                                        }
+                                        disabled={isLoading}
+                                    />
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="city">City</Label>
-                                    <Input id="city" />
+                                    <Input
+                                        id="city"
+                                        type="text"
+                                        value={city}
+                                        onChange={(e) =>
+                                            setCity(e.target.value)
+                                        }
+                                        disabled={isLoading}
+                                    />
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="postalCode">
                                         Postal Code
                                     </Label>
-                                    <Input id="postalCode" />
+                                    <Input
+                                        id="postalCode"
+                                        type="text"
+                                        value={postalCode}
+                                        onChange={(e) =>
+                                            setPostalCode(e.target.value)
+                                        }
+                                        disabled={isLoading}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -148,24 +274,32 @@ const Checkout = () => {
                                 <div className="space-y-2">
                                     <div className="flex justify-between">
                                         <span>Subtotal</span>
-                                        <span>$339.98</span>
+                                        <span>${fees.subtotal.toFixed(2)}</span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span>Shipping</span>
-                                        <span>$10.00</span>
+                                        <span>
+                                            ${fees.shippingFee.toFixed(2)}
+                                        </span>
                                     </div>
                                     <Separator />
                                     <div className="flex justify-between font-medium">
                                         <span>Total</span>
-                                        <span>$349.98</span>
+                                        <span>${fees.total.toFixed(2)}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Button className="w-full" size="lg">
-                            Place Order
+                        <Button
+                            type="button"
+                            className="w-full"
+                            size="lg"
+                            onClick={handlePlaceOrder}
+                            disabled={isLoading}
+                        >
+                            {isLoading ? "Placing Order..." : "Place Order"}
                         </Button>
                     </CardFooter>
                 </Card>
