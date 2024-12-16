@@ -46,7 +46,7 @@ const ShippingPreferences = () => {
                     setCountry(country || "");
                 }
 
-                console.log("shipping pref:", data)
+                console.log("shipping pref:", data);
             } catch (error) {
                 console.error("Shipping preference fetch error:", error);
             } finally {
@@ -59,6 +59,7 @@ const ShippingPreferences = () => {
 
     const handleUpdateShippingPreference = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
 
         try {
             const response = await fetch(
@@ -82,9 +83,10 @@ const ShippingPreferences = () => {
                 throw new Error("Failed to update shipping address");
             }
 
-            
         } catch (error) {
             console.error("Change shipping preference error:", error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -147,7 +149,7 @@ const ShippingPreferences = () => {
                         </div>
 
                         <div className="flex justify-end pt-4">
-                            <Button type="button" disabled={isLoading}>
+                            <Button type="submit" disabled={isLoading}>
                                 {isLoading ? "Saving..." : "Save Changes"}
                             </Button>
                         </div>
