@@ -4,6 +4,8 @@ export const ModalTypes = {
     CREATE_PRODUCT: "createProduct",
     UPDATE_PRODUCT: "updateProduct",
     DELETE_PRODUCT: "deleteProduct",
+    VIEW_ORDER: "viewOrder",
+    UPDATE_ORDER: "updateOrder",
 };
 
 const useModalStore = create((set) => ({
