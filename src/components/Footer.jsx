@@ -1,7 +1,16 @@
+import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 
 const Footer = () => {
+    const [email, setEmail] = useState("");
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        setEmail("");
+    };
+
     return (
         <footer className="bg-muted">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -102,8 +111,16 @@ const Footer = () => {
                             Subscribe to our newsletter for updates and
                             exclusive offers.
                         </p>
-                        <form className="flex space-x-2">
-                            <Input type="email" placeholder="Your email" />
+                        <form
+                            onSubmit={handleSubmit}
+                            className="flex space-x-2"
+                        >
+                            <Input
+                                type="email"
+                                placeholder="Your email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
                             <Button type="submit">Subscribe</Button>
                         </form>
                     </div>
