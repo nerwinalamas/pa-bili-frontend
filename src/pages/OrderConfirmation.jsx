@@ -87,8 +87,8 @@ const OrderConfirmation = () => {
                                 <span className="font-medium">
                                     Order Number
                                 </span>
-                                <span className="text-gray-600">
-                                    #ORD-2024-{id.slice(0, 4)}
+                                <span className="text-gray-600 uppercase">
+                                    ORD-2024-{id.slice(-4)}
                                 </span>
                             </div>
                             <div className="flex justify-between items-center">
