@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import HomeLayout from "./layouts/HomeLayout";
 import ProtectedRoute from "./layouts/ProtectedRoute";
+import DashboardLayout from "./layouts/DashboardLayout";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -19,6 +20,7 @@ import ShippingPreferences from "./pages/ShippingPreferences";
 import PaymentMethods from "./pages/PaymentMethods";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
+import Orders from "./pages/Orders";
 
 const App = () => {
     return (
@@ -39,13 +41,28 @@ const App = () => {
                     <Route path="/" element={<HomeLayout />}>
                         <Route path="/cart" element={<Cart />} />
                         <Route path="/account" element={<Account />} />
-                        <Route path="/account/change-password" element={<ChangePassword />} />
-                        <Route path="/account/payment-methods" element={<PaymentMethods />} />
-                        <Route path="/account/shipping-preferences" element={<ShippingPreferences />} />
+                        <Route
+                            path="/account/change-password"
+                            element={<ChangePassword />}
+                        />
+                        <Route
+                            path="/account/payment-methods"
+                            element={<PaymentMethods />}
+                        />
+                        <Route
+                            path="/account/shipping-preferences"
+                            element={<ShippingPreferences />}
+                        />
                         <Route path="/checkout" element={<Checkout />} />
-                        <Route path="/order-confirmation/:id" element={<OrderConfirmation />} />
+                        <Route
+                            path="/order-confirmation/:id"
+                            element={<OrderConfirmation />}
+                        />
                     </Route>
-                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route element={<DashboardLayout />}>
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/orders" element={<Orders />} />
+                    </Route>
                 </Route>
             </Routes>
             <ModalProvider />
