@@ -50,7 +50,7 @@ const OrderHistory = () => {
 
     // Paginate data
     const paginatedData = orderHistory.slice(
-        (currentPage - 1) * pageSize, 
+        (currentPage - 1) * pageSize,
         currentPage * pageSize
     );
 
@@ -101,9 +101,15 @@ const OrderHistory = () => {
                     <TableBody>
                         {paginatedData.map((order) => (
                             <TableRow key={order._id}>
-                                <TableCell>{order._id}</TableCell>
-                                <TableCell>{format(order.createdAt, "MMMM dd, yyyy")}</TableCell>
-                                <TableCell>${order.totalPrice.toFixed(2)}</TableCell>
+                                <TableCell className="uppercase">
+                                    ORD-2024-{order._id.slice(-4)}
+                                </TableCell>
+                                <TableCell>
+                                    {format(order.createdAt, "MMMM dd, yyyy")}
+                                </TableCell>
+                                <TableCell>
+                                    ${order.totalPrice.toFixed(2)}
+                                </TableCell>
                                 <TableCell>{order.orderStatus}</TableCell>
                             </TableRow>
                         ))}
@@ -115,7 +121,9 @@ const OrderHistory = () => {
                     <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        onClick={() =>
+                            setCurrentPage((prev) => Math.max(1, prev - 1))
+                        }
                         disabled={currentPage === 1}
                     >
                         Previous
@@ -126,7 +134,11 @@ const OrderHistory = () => {
                     <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        onClick={() =>
+                            setCurrentPage((prev) =>
+                                Math.min(totalPages, prev + 1)
+                            )
+                        }
                         disabled={currentPage === totalPages}
                     >
                         Next
