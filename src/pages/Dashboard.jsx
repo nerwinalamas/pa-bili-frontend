@@ -25,18 +25,13 @@ const Dashboard = () => {
     };
 
     return (
-        <main className="min-h-screen container mx-auto px-4 py-8">
-            <div className="mb-6">
-                <h1 className="text-3xl font-bold mb-4">
-                    Admin - Product Management
-                </h1>
-                <ProductsTable 
-                    products={products}
-                    onAddProduct={handleAddProduct}
-                    onEditProduct={handleEditProduct}
-                    onDeleteProduct={handleDeleteProduct}
-                />
-            </div>
+        <main className="min-h-screen container mx-auto mt-4">
+            <ProductsTable
+                products={products}
+                onAddProduct={handleAddProduct}
+                onEditProduct={handleEditProduct}
+                onDeleteProduct={handleDeleteProduct}
+            />
         </main>
     );
 };
