@@ -30,18 +30,19 @@ const Cart = () => {
     }, [id, fetchCart]);
 
     const updateQuantity = async (productId, newQuantity) => {
-        if (newQuantity >= 0) {
-            const item = {
-                userId: id,
-                productId,
-                quantity: newQuantity,
-            };
-
-            try {
-                await updateItemQuantity(item);
-            } catch (error) {
-                console.error("Update quantity error:", error);
-            }
+        if (newQuantity < 0) return;
+    
+        const item = {
+            userId: id,
+            productId,
+            quantity: newQuantity,
+        };
+    
+        try {
+            await updateItemQuantity(item);
+            fetchCart(id);
+        } catch (error) {
+            console.error("Update quantity error:", error);
         }
     };
 
@@ -130,6 +131,7 @@ const Cart = () => {
                                         <TableCell>
                                             <div className="flex w-[150px] items-center">
                                                 <Button
+                                                    type="button"
                                                     variant="outline"
                                                     size="icon"
                                                     className="rounded-none"
@@ -148,6 +150,7 @@ const Cart = () => {
                                                     </span>
                                                 </div>
                                                 <Button
+                                                    type="button"
                                                     variant="outline"
                                                     size="icon"
                                                     className="rounded-none"
