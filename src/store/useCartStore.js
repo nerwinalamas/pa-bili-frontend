@@ -80,7 +80,9 @@ const useCartStore = create((set) => ({
             );
 
             set((state) => ({
-                cartItems: state.cartItems.filter(cartItem => cartItem.productId._id !== item.productId),
+                cartItems: state.cartItems.filter(
+                    (cartItem) => cartItem.productId._id !== item.productId
+                ),
                 itemCount: newItemCount,
             }));
         } catch (error) {
@@ -113,6 +115,8 @@ const useCartStore = create((set) => ({
                 cartItems: updatedCart.items,
                 itemCount: newItemCount,
             });
+
+            return updatedCart;
         } catch (error) {
             console.error("Error updating item quantity:", error);
         }
