@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../lib/constants";
+import { useAuth } from "../hooks/useAuth";
 import useCartStore from "../store/useCartStore";
 import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
@@ -21,7 +23,6 @@ import {
     TableHeader,
     TableRow,
 } from "../components/ui/table";
-import { useNavigate } from "react-router-dom";
 
 const ProductList = () => {
     const cartItems = useCartStore((state) => state.cartItems);
@@ -61,8 +62,12 @@ const Checkout = () => {
     const [postalCode, setPostalCode] = useState("");
     const [country, setCountry] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [isManualInput, setIsManualInput] = useState(false);
 
     const cartItems = useCartStore((state) => state.cartItems);
+    const fetchCart = useCartStore((state) => state.fetchCart);
+
+    const { id } = useAuth();
 
     const navigate = useNavigate();
 
@@ -85,14 +90,25 @@ const Checkout = () => {
 
                 const data = await response.json();
 
+                if (
+                    !data.street ||
+                    !data.city ||
+                    !data.postalCode ||
+                    !data.country
+                ) {
+                    setIsManualInput(true);
+                    console.log("All fields are required");
+                }
+
                 setFirstName(data.firstName);
                 setLastName(data.lastName);
-                setStreet(data.street);
-                setCity(data.city);
-                setPostalCode(data.postalCode);
-                setCountry(data.country);
+                setStreet(data.street || "");
+                setCity(data.city || "");
+                setPostalCode(data.postalCode || "");
+                setCountry(data.country || "");
             } catch (error) {
                 console.error("fetch data error:", error);
+                setIsManualInput(true);
             } finally {
                 setIsLoading(false);
             }
@@ -115,6 +131,7 @@ const Checkout = () => {
     const fees = calculateTotal();
 
     const handlePlaceOrder = async () => {
+        if (!id) return;
         setIsLoading(true);
 
         try {
@@ -126,7 +143,12 @@ const Checkout = () => {
                 },
                 body: JSON.stringify({
                     orderItems: cartItems,
-                    shippingAddress: { street, city, postalCode, country },
+                    shippingAddress: {
+                        street,
+                        city,
+                        postalCode,
+                        country: isManualInput ? "Philippines" : country,
+                    },
                     paymentMethod,
                 }),
             });
@@ -137,11 +159,15 @@ const Checkout = () => {
 
             const data = await response.json();
 
-            navigate(`/order-confirmation/${data._id}`)
+            fetchCart(id);
+            setTimeout(() => {
+                navigate(`/order-confirmation/${data._id}`);
+            }, 300);
         } catch (error) {
             console.error("Place order error:", error);
         } finally {
             setIsLoading(false);
+            setIsManualInput(false);
         }
     };
 
