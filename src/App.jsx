@@ -13,7 +13,7 @@ import Contact from "./pages/Contact";
 import Cart from "./pages/Cart";
 import Account from "./pages/Account";
 import Dashboard from "./pages/Dashboard";
-import ModalProvider from "./providers/modalProvider";
+import ModalProvider from "./providers/ModalProvider";
 import ProductDetails from "./pages/ProductDetails";
 import ChangePassword from "./pages/ChangePassword";
 import ShippingPreferences from "./pages/ShippingPreferences";
